@@ -1,0 +1,4 @@
+*.pyc
+*.feather
+/output/*
+/cache/*

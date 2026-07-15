@@ -17,6 +17,7 @@ dependencies = [
     "xsdata==24.11",
     "pyarrow==20.0.0",
     "cairosvg==2.9.0",
+    "lifelines==0.30.3",
 ]
 
 [tool.setuptools]

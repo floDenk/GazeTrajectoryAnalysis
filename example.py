@@ -1,7 +1,7 @@
 from equgat import equgat
 from util.config import GazeDatabase
 
-# The gaze database 'RightGazeUrban-2022' is available on Zenodo: TODO: add Zenodo URL
+# The gaze database 'RightGazeUrban-2022' is available on Zenodo: https://zenodo.org/records/20717040
 # Download and extract it, specify the path to the extracted folder in gaze_db_path below.
 gaze_db_location = ''
 

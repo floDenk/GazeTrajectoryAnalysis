@@ -232,6 +232,12 @@ Delete or clear the `cache/` folder to force recomputation (e.g. after modifying
 
 ---
 
+## Funding
+
+This work was supported by the Technische Hochschule Ingolstadt and the European Union within the Horizon Europe programme under Grant No. 101075068 (V4SAFETY).
+
+---
+
 ## Project Structure
 
 ```

@@ -125,7 +125,9 @@ def equgat(
         return hashlib.md5(np.ascontiguousarray(arr)).hexdigest()
 
 
+    os.makedirs('cache', exist_ok=True)
     cache_path = 'cache/' + os.path.basename(xodr_file_location) + '.fov_cache.pkl'
+    
     cache_hit = False
     if os.path.isfile(cache_path):
         with open(cache_path, 'rb') as f:
@@ -144,13 +146,14 @@ def equgat(
             print("Cache mismatch (xodr file, AOI config, or road reference data changed) — recomputing.")
 
     if not cache_hit:
+        print("Precomputing FOV polygons for all AOIs and all time steps...")
+        
         fov_dict_polygons            = {aoi: np.zeros(len(s_lane_car), dtype=Polygon) for aoi in fov_dict}
         intersections_cycling_track  = {aoi: np.zeros(len(s_lane_car), dtype=Polygon) for aoi in fov_dict}
         fov_s_coverage_cycling_track = {aoi: np.empty(len(s_lane_car), dtype=object) for aoi in fov_dict}
 
-        if plot_on:
-            fig, ax = plt.subplots()
-
+        fig, ax = plt.subplots()
+        
         for idx in range(len(s_lane_car)):
             for aoi in fov_dict.keys():
                 fov_dict_polygons[aoi][idx] = affinity.translate(
@@ -159,18 +162,18 @@ def equgat(
                 if occlusion_object is not None:
                     fov_dict_polygons[aoi][idx] = compute_visibility(fov_dict_polygons[aoi][idx], occlusion_object)
 
-                if plot_on:
-                    _aoi_shapes = [fov_dict_polygons[aoi][idx]] if show_gaze_aoi else []
-                    _aoi_colors_now = [aoi_colors[aoi]] if show_gaze_aoi else []
-                    _aoi_alphas_now = [aoi_alphas[aoi]] if show_gaze_aoi else []
-                    plot(idx, fig, ax, aoi,tStep,
-                         _lane_shapes + _aoi_shapes + [occlusion_object],
-                         top_view_image=top_view_image,
-                         car_img=car_img, car_x=x_lane_car[idx],
-                         car_y=y_lane_car[idx], car_angle_deg=np.rad2deg(psi_lane_car[idx]),
-                         shapely_colors=_lane_colors + _aoi_colors_now + [None],
-                         shapely_alphas=_lane_alphas + _aoi_alphas_now + [None],
-                         view_box=view_box, transparent_bg=transparent_bg)
+                
+                _aoi_shapes = [fov_dict_polygons[aoi][idx]] if show_gaze_aoi else []
+                _aoi_colors_now = [aoi_colors[aoi]] if show_gaze_aoi else []
+                _aoi_alphas_now = [aoi_alphas[aoi]] if show_gaze_aoi else []
+                plot(idx, fig, ax, aoi,tStep,
+                        _lane_shapes + _aoi_shapes + [occlusion_object],
+                        top_view_image=top_view_image,
+                        car_img=car_img, car_x=x_lane_car[idx],
+                        car_y=y_lane_car[idx], car_angle_deg=np.rad2deg(psi_lane_car[idx]),
+                        shapely_colors=_lane_colors + _aoi_colors_now + [None],
+                        shapely_alphas=_lane_alphas + _aoi_alphas_now + [None],
+                        view_box=view_box, transparent_bg=transparent_bg)
 
                 intersections_cycling_track[aoi][idx] = intersection(fov_dict_polygons[aoi][idx], cycling_track)
                 
@@ -329,5 +332,6 @@ def equgat(
         df_time_to_perception.drop('cyclistWasInSight', axis=1, inplace=True)
 
         if not plot_on:
+            os.makedirs('output', exist_ok=True)
             df_time_to_perception.to_feather('output/time_to_perception_event.feather')
     #endregion
